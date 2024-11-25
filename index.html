@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DMCABS - Passenger App</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <link rel="stylesheet" href="style.css"> <!-- Link to external CSS -->
-    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY&libraries=places&callback=initMap" async defer></script> <!-- Google Maps API -->
 </head>
 <body>
     <div id="map"></div> <!-- Map container -->
@@ -13,6 +13,13 @@
         <button class="request-ride-btn" onclick="requestRide()">Request a Ride</button>
     </div>
 
+    <!-- Available Cars List -->
+    <div id="availableCars" class="available-cars">
+        <h3>Available Cars</h3>
+        <ul id="carList"></ul>
+    </div>
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script> <!-- Leaflet JS -->
     <script src="script.js"></script> <!-- Link to external JavaScript -->
 </body>
 </html>
