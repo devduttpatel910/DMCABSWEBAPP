@@ -34,3 +34,30 @@ body, html {
 .request-ride-btn:hover {
     background-color: #0f5bb2;
 }
+
+/* Available Cars Section */
+.available-cars {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    max-width: 300px;
+    height: 300px;
+    overflow-y: scroll;
+}
+
+#carList {
+    list-style-type: none;
+    padding: 0;
+}
+
+#carList li {
+    margin: 10px 0;
+    padding: 10px;
+    background-color: #f1f1f1;
+    border-radius: 5px;
+    font-size: 14px;
+}
