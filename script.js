@@ -19,9 +19,10 @@ function initMap() {
             map = L.map('map').setView([currentLat, currentLng], 15);
 
             // Add OpenStreetMap tile layer
-            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-            }).addTo(map);
+            L.tileLayer('https://{s}.tile.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiZGV2ZHV0dDAzIiwiYSI6ImNtM2JsbTBkODFnN3EyanNjODl6NjIwZG4ifQ.oHgNKjHMdHf4WW_Kkwsmrg', {
+            attribution: '&copy; <a href="https://www.mapbox.com/about/maps/">Mapbox</a>',
+              id: 'mapbox.streets'
+             }).addTo(map);
 
             // Add a marker at the user's location
             userMarker = L.marker([currentLat, currentLng]).addTo(map)
