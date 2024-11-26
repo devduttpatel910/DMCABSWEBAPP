@@ -1,9 +1,9 @@
 // Initialize map and set default view
 const map = L.map('map').setView([20, 0], 2); // World view
 
-// Add satellite map layer
+// Add satellite map layer with the updated Mapbox key
 L.tileLayer(
-    'https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v11/tiles/{z}/{x}/{y}?access_token=sk.eyJ1IjoiZGV2ZHV0dDAzIiwiYSI6ImNtM2JyaWp5ejFydjAycXF4NHM1bHptMmMifQ.i6yTVvdvB2M5XyzI7K5ezw', 
+    'https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v11/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoiZGV2ZHV0dDAzIiwiYSI6ImNtM3k0YmUxdDFmb3cybHNjMGh5dGFoMXIifQ.ilgwEjlw8e8FhQMWgD9ndw', 
     {
         attribution: 'Map data &copy; <a href="https://www.mapbox.com/">Mapbox</a>',
         tileSize: 512,
@@ -55,7 +55,7 @@ function simulateDriverLocation() {
     if (driverMarker) map.removeLayer(driverMarker);
 
     // Add driver marker
-    driverMarker = L.marker([driverLat, driverLng], { color: 'green' }).addTo(map)
+    driverMarker = L.marker([driverLat, driverLng]).addTo(map)
         .bindPopup("Driver is nearby").openPopup();
 }
 
