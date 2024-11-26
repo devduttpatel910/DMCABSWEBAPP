@@ -3,17 +3,47 @@ mapboxgl.accessToken = 'pk.eyJ1IjoiZGV2ZHV0dDAzIiwiYSI6ImNtM3k0YmUxdDFmb3cybHNjM
 // Initialize the map
 const map = new mapboxgl.Map({
     container: 'map', // Container ID
-    style: 'mapbox://styles/mapbox/streets-v11', // Map style
+    style: 'mapbox://styles/mapbox/satellite-streets-v12', // Satellite map style
     center: [77.2295, 28.6129], // Default center (India Gate)
-    zoom: 13, // Default zoom
+    zoom: 14, // Default zoom
 });
 
-// Array of available cars (update coordinates to match your region)
-const availableCars = [
-    { id: 1, name: "Car 1", lat: 28.6139, lng: 77.2295 },
-    { id: 2, name: "Car 2", lat: 28.6149, lng: 77.2240 },
-    { id: 3, name: "Car 3", lat: 28.6100, lng: 77.2300 }
-];
+// Randomize nearby car locations
+function randomizeCarLocations(lat, lng) {
+    const randomOffset = () => (Math.random() - 0.5) * 0.01; // Random offset within ~1km
+    return Array.from({ length: 5 }, (_, i) => ({
+        id: i + 1,
+        name: `Car ${i + 1}`,
+        lat: lat + randomOffset(),
+        lng: lng + randomOffset(),
+    }));
+}
+
+// Add car markers to the map
+function addCarMarkers(cars) {
+    cars.forEach(car => {
+        const marker = new mapboxgl.Marker({ color: 'red' }) // Red marker for cars
+            .setLngLat([car.lng, car.lat])
+            .addTo(map);
+    });
+}
+
+// Populate the car list with distances
+function populateCarList(cars, userLocation) {
+    const carList = document.getElementById('car-list');
+    carList.innerHTML = ''; // Clear the list
+
+    cars.forEach(car => {
+        const distance = calculateDistance(
+            userLocation.lat, userLocation.lng,
+            car.lat, car.lng
+        ).toFixed(2); // Calculate distance and round to 2 decimals
+
+        const listItem = document.createElement('li');
+        listItem.innerText = `${car.name} - ${distance} km away`;
+        carList.appendChild(listItem);
+    });
+}
 
 // Calculate distance using Haversine formula
 function calculateDistance(lat1, lon1, lat2, lon2) {
@@ -26,32 +56,6 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
               Math.sin(dLon / 2) * Math.sin(dLon / 2);
     const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     return R * c; // Distance in km
-}
-
-// Add car markers to the map
-function addCarMarkers() {
-    availableCars.forEach(car => {
-        const marker = new mapboxgl.Marker({ color: 'red' }) // Red marker for cars
-            .setLngLat([car.lng, car.lat])
-            .addTo(map);
-    });
-}
-
-// Populate the car list with distances
-function populateCarList(userLocation) {
-    const carList = document.getElementById('car-list');
-    carList.innerHTML = ''; // Clear the list
-
-    availableCars.forEach(car => {
-        const distance = calculateDistance(
-            userLocation.lat, userLocation.lng,
-            car.lat, car.lng
-        ).toFixed(2); // Calculate distance and round to 2 decimals
-
-        const listItem = document.createElement('li');
-        listItem.innerText = `${car.name} - ${distance} km away`;
-        carList.appendChild(listItem);
-    });
 }
 
 // Get the user's location
@@ -68,11 +72,14 @@ navigator.geolocation.getCurrentPosition(
             .setLngLat([userLng, userLat])
             .addTo(map);
 
+        // Randomize car locations near the user's location
+        const nearbyCars = randomizeCarLocations(userLat, userLng);
+
         // Populate the car list
-        populateCarList({ lat: userLat, lng: userLng });
+        populateCarList(nearbyCars, { lat: userLat, lng: userLng });
 
         // Add car markers to the map
-        addCarMarkers();
+        addCarMarkers(nearbyCars);
     },
     (error) => {
         console.error("Error getting location", error);
