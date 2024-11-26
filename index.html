@@ -3,28 +3,54 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DMCABS - Passenger App</title>
-    <!-- Mapbox CSS -->
-    <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet">
-    <link rel="stylesheet" href="style.css"> <!-- External CSS -->
+    <title>DMCabs Passenger App</title>
+    <link
+        href="https://api.mapbox.com/mapbox-gl-js/v2.16.1/mapbox-gl.css"
+        rel="stylesheet"
+    />
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+        }
+        #map {
+            width: 100%;
+            height: 100vh;
+        }
+        .cars-list {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: white;
+            border-radius: 8px;
+            padding: 10px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+        }
+        .cars-list h3 {
+            margin: 0 0 10px;
+        }
+        button {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
-    <!-- Map Container -->
     <div id="map"></div>
-
-    <!-- Ride Request Button -->
-    <div class="button-container">
-        <button class="request-ride-btn" onclick="requestRide()">Request a Ride</button>
-    </div>
-
-    <!-- Available Cars List -->
-    <div id="availableCars" class="available-cars">
+    <div class="cars-list">
         <h3>Available Cars</h3>
-        <ul id="carList"></ul>
+        <ul id="car-list"></ul>
     </div>
-
-    <!-- Mapbox JS -->
-    <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
-    <script src="script.js"></script> <!-- External JS -->
+    <button>Request a Ride</button>
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.16.1/mapbox-gl.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
