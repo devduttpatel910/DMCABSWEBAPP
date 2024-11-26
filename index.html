@@ -8,27 +8,24 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 </head>
 <body>
-    <header>
-        <h1>DMCabs Services</h1>
-    </header>
-    <div class="controls">
-        <button onclick="findUserLocation()">Find My Location</button>
-        <button onclick="simulateDriverLocation()">Simulate Driver Location</button>
-    </div>
+    <h1>DMCabs Services</h1>
+    <button onclick="findUserLocation()">Find My Location</button>
+    <button onclick="driverLocation()">Driver Location</button>
     <div id="map"></div>
 
-    <!-- Leaflet Map Library -->
-    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <!-- Alcohol Level Meter -->
+    <div id="alcohol-level-container">
+        <p>Alcohol Level Meter:</p>
+        <div id="alcohol-meter">
+            <div id="alcohol-level-bar"></div>
+        </div>
+    </div>
 
-    <!-- Firebase -->
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script src="script.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database.js"></script>
-
-    <!-- Custom Script -->
-    <script src="script.js"></script>
-
     <script>
-        // Firebase configuration
         const firebaseConfig = {
             apiKey: "AIzaSyARNvsfeaO4qnlsxTU0ts0dYzo15k44YKg",
             authDomain: "palchol.firebaseapp.com",
@@ -39,7 +36,6 @@
             appId: "1:474802254344:web:1ed97faaa247e7e23b97bd"
         };
 
-        // Initialize Firebase
         firebase.initializeApp(firebaseConfig);
     </script>
 </body>
