@@ -1,88 +1,99 @@
-mapboxgl.accessToken = 'pk.eyJ1IjoiZGV2ZHV0dDAzIiwiYSI6ImNtM3k0YmUxdDFmb3cybHNjMGh5dGFoMXIifQ.ilgwEjlw8e8FhQMWgD9ndw';
+// Initialize map and set default view
+const map = L.map('map').setView([20, 0], 2); // World view
 
-// Initialize the map
-const map = new mapboxgl.Map({
-    container: 'map', // Container ID
-    style: 'mapbox://styles/mapbox/satellite-streets-v12', // Satellite map style
-    center: [77.2295, 28.6129], // Default center (India Gate)
-    zoom: 14, // Default zoom
+// Add satellite map layer
+L.tileLayer(
+    'https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v11/tiles/{z}/{x}/{y}?access_token=sk.eyJ1IjoiZGV2ZHV0dDAzIiwiYSI6ImNtM2JyaWp5ejFydjAycXF4NHM1bHptMmMifQ.i6yTVvdvB2M5XyzI7K5ezw', 
+    {
+        attribution: 'Map data &copy; <a href="https://www.mapbox.com/">Mapbox</a>',
+        tileSize: 512,
+        zoomOffset: -1,
+    }
+).addTo(map);
+
+let userMarker, driverMarker;
+
+// Function to find user's location
+function findUserLocation() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            position => {
+                const userLat = position.coords.latitude;
+                const userLng = position.coords.longitude;
+
+                // Remove old user marker
+                if (userMarker) map.removeLayer(userMarker);
+
+                // Add user marker
+                userMarker = L.marker([userLat, userLng]).addTo(map)
+                    .bindPopup("You are here").openPopup();
+
+                // Center the map to user's location
+                map.setView([userLat, userLng], 14);
+            },
+            error => {
+                alert("Unable to access your location. Please enable location services.");
+            }
+        );
+    } else {
+        alert("Geolocation is not supported by your browser.");
+    }
+}
+
+// Function to simulate driver location
+function simulateDriverLocation() {
+    if (!userMarker) {
+        alert("Please find your location first.");
+        return;
+    }
+
+    const userLocation = userMarker.getLatLng();
+    const driverLat = userLocation.lat + (Math.random() * 0.02 - 0.01);
+    const driverLng = userLocation.lng + (Math.random() * 0.02 - 0.01);
+
+    // Remove old driver marker
+    if (driverMarker) map.removeLayer(driverMarker);
+
+    // Add driver marker
+    driverMarker = L.marker([driverLat, driverLng], { color: 'green' }).addTo(map)
+        .bindPopup("Driver is nearby").openPopup();
+}
+
+// Firebase Database Integration
+const db = firebase.database();
+const alcoholLevelRef = db.ref('alcoholLevel');
+
+// Alcohol level threshold
+const threshold = 500;
+
+// Listen for alcohol level changes in Firebase
+alcoholLevelRef.on('value', snapshot => {
+    const alcoholLevel = snapshot.val();
+    console.log("Alcohol Level: ", alcoholLevel);
+
+    alert(`Alcohol Level: ${alcoholLevel}`);
+
+    if (alcoholLevel > threshold) {
+        sendNotification("High Alcohol Level Detected!");
+    }
 });
 
-// Randomize nearby car locations
-function randomizeCarLocations(lat, lng) {
-    const randomOffset = () => (Math.random() - 0.5) * 0.01; // Random offset within ~1km
-    return Array.from({ length: 5 }, (_, i) => ({
-        id: i + 1,
-        name: `Car ${i + 1}`,
-        lat: lat + randomOffset(),
-        lng: lng + randomOffset(),
-    }));
-}
-
-// Add car markers to the map
-function addCarMarkers(cars) {
-    cars.forEach(car => {
-        const marker = new mapboxgl.Marker({ color: 'red' }) // Red marker for cars
-            .setLngLat([car.lng, car.lat])
-            .addTo(map);
-    });
-}
-
-// Populate the car list with distances
-function populateCarList(cars, userLocation) {
-    const carList = document.getElementById('car-list');
-    carList.innerHTML = ''; // Clear the list
-
-    cars.forEach(car => {
-        const distance = calculateDistance(
-            userLocation.lat, userLocation.lng,
-            car.lat, car.lng
-        ).toFixed(2); // Calculate distance and round to 2 decimals
-
-        const listItem = document.createElement('li');
-        listItem.innerText = `${car.name} - ${distance} km away`;
-        carList.appendChild(listItem);
-    });
-}
-
-// Calculate distance using Haversine formula
-function calculateDistance(lat1, lon1, lat2, lon2) {
-    const toRad = (value) => (value * Math.PI) / 180;
-    const R = 6371; // Radius of Earth in km
-    const dLat = toRad(lat2 - lat1);
-    const dLon = toRad(lon2 - lon1);
-    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-              Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
-              Math.sin(dLon / 2) * Math.sin(dLon / 2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    return R * c; // Distance in km
-}
-
-// Get the user's location
-navigator.geolocation.getCurrentPosition(
-    (position) => {
-        const userLat = position.coords.latitude;
-        const userLng = position.coords.longitude;
-
-        // Set map center to user's location
-        map.setCenter([userLng, userLat]);
-
-        // Add user location marker (blue)
-        new mapboxgl.Marker({ color: 'blue' })
-            .setLngLat([userLng, userLat])
-            .addTo(map);
-
-        // Randomize car locations near the user's location
-        const nearbyCars = randomizeCarLocations(userLat, userLng);
-
-        // Populate the car list
-        populateCarList(nearbyCars, { lat: userLat, lng: userLng });
-
-        // Add car markers to the map
-        addCarMarkers(nearbyCars);
-    },
-    (error) => {
-        console.error("Error getting location", error);
-        alert("Unable to retrieve your location. Ensure location services are enabled.");
+// Send browser notification
+function sendNotification(message) {
+    if (Notification.permission === "granted") {
+        new Notification("DMCabs Alert", { body: message });
+    } else if (Notification.permission !== "denied") {
+        Notification.requestPermission().then(permission => {
+            if (permission === "granted") {
+                new Notification("DMCabs Alert", { body: message });
+            }
+        });
     }
-);
+}
+
+// Request notification permissions on page load
+document.addEventListener('DOMContentLoaded', () => {
+    if (Notification.permission !== "granted") {
+        Notification.requestPermission();
+    }
+});
