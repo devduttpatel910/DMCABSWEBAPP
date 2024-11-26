@@ -1,9 +1,9 @@
 // Initialize map and set default view
-const map = L.map('map').setView([20, 0], 2); // World view
+const map = L.map('map').setView([20, 0], 2);
 
-// Add satellite map layer with the updated Mapbox key
+// Add satellite-streets map layer
 L.tileLayer(
-    'https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v11/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoiZGV2ZHV0dDAzIiwiYSI6ImNtM3k0YmUxdDFmb3cybHNjMGh5dGFoMXIifQ.ilgwEjlw8e8FhQMWgD9ndw', 
+    'https://api.mapbox.com/styles/v1/mapbox/satellite-streets-v11/tiles/{z}/{x}/{y}?access_token=pk.eyJ1IjoiZGV2ZHV0dDAzIiwiYSI6ImNtM3k0YmUxdDFmb3cybHNjMGh5dGFoMXIifQ.ilgwEjlw8e8FhQMWgD9ndw',
     {
         attribution: 'Map data &copy; <a href="https://www.mapbox.com/">Mapbox</a>',
         tileSize: 512,
@@ -12,6 +12,13 @@ L.tileLayer(
 ).addTo(map);
 
 let userMarker, driverMarker;
+
+// Custom red marker for the driver
+const redIcon = L.icon({
+    iconUrl: 'https://cdn-icons-png.flaticon.com/512/684/684908.png', // Replace with any red marker image URL
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+});
 
 // Function to find user's location
 function findUserLocation() {
@@ -40,8 +47,8 @@ function findUserLocation() {
     }
 }
 
-// Function to simulate driver location
-function simulateDriverLocation() {
+// Function to display driver location and calculate distance
+function driverLocation() {
     if (!userMarker) {
         alert("Please find your location first.");
         return;
@@ -55,25 +62,30 @@ function simulateDriverLocation() {
     if (driverMarker) map.removeLayer(driverMarker);
 
     // Add driver marker
-    driverMarker = L.marker([driverLat, driverLng]).addTo(map)
+    driverMarker = L.marker([driverLat, driverLng], { icon: redIcon }).addTo(map)
         .bindPopup("Driver is nearby").openPopup();
+
+    // Calculate distance between user and driver
+    const distance = map.distance(userLocation, [driverLat, driverLng]).toFixed(2);
+    alert(`Driver is ${distance} meters away.`);
 }
 
 // Firebase Database Integration
 const db = firebase.database();
 const alcoholLevelRef = db.ref('alcoholLevel');
 
-// Alcohol level threshold
-const threshold = 500;
-
-// Listen for alcohol level changes in Firebase
+// Update Alcohol Level Meter
 alcoholLevelRef.on('value', snapshot => {
     const alcoholLevel = snapshot.val();
     console.log("Alcohol Level: ", alcoholLevel);
 
-    alert(`Alcohol Level: ${alcoholLevel}`);
+    // Update the progress bar
+    const alcoholLevelBar = document.getElementById('alcohol-level-bar');
+    const percentage = Math.min(alcoholLevel / 1000 * 100, 100); // Cap at 100%
+    alcoholLevelBar.style.width = `${percentage}%`;
 
-    if (alcoholLevel > threshold) {
+    // Alert if alcohol level exceeds threshold
+    if (alcoholLevel > 500) {
         sendNotification("High Alcohol Level Detected!");
     }
 });
