@@ -1,5 +1,5 @@
 // Set Mapbox Access Token
-mapboxgl.accessToken = 'pk.eyJ1IjoiZGV2ZHV0dDAzIiwiYSI6ImNtM2JsbTBkODFnN3EyanNjODl6NjIwZG4ifQ.oHgNKjHMdHf4WW_Kkwsmrg';
+mapboxgl.accessToken = 'pk.eyJ1IjoiZGV2ZHV0dDAzIiwiYSI6ImNtM3k0YmUxdDFmb3cybHNjMGh5dGFoMXIifQ.ilgwEjlw8e8FhQMWgD9ndw';
 
 // Initialize Variables
 let map, userMarker;
