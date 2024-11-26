@@ -1,51 +1,60 @@
+// Set Mapbox Access Token
+mapboxgl.accessToken = 'pk.eyJ1IjoiZGV2ZHV0dDAzIiwiYSI6ImNtM2JsbTBkODFnN3EyanNjODl6NjIwZG4ifQ.oHgNKjHMdHf4WW_Kkwsmrg';
+
+// Initialize Variables
 let map, userMarker;
 let currentLat, currentLng;
 
-// Simulated list of available cars (drivers' locations)
+// Simulated Available Cars
 const availableCars = [
-    { id: 1, name: "Car 1", lat: 20.5937, lng: 78.9629, distance: 0 },
-    { id: 2, name: "Car 2", lat: 20.5947, lng: 78.9639, distance: 0 },
-    { id: 3, name: "Car 3", lat: 20.5957, lng: 78.9649, distance: 0 }
+    { id: 1, name: "Car 1", lat: 20.5947, lng: 78.9632 },
+    { id: 2, name: "Car 2", lat: 20.5957, lng: 78.9642 },
+    { id: 3, name: "Car 3", lat: 20.5967, lng: 78.9652 }
 ];
 
-// Initialize Leaflet Map
+// Initialize Map
 function initMap() {
     if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(function(position) {
+        navigator.geolocation.getCurrentPosition(position => {
             currentLat = position.coords.latitude;
             currentLng = position.coords.longitude;
 
-            // Initialize the map centered on user's location
-            map = L.map('map').setView([currentLat, currentLng], 15);
-
-            // Add OpenStreetMap tile layer
-            L.tileLayer('https://{s}.tile.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token=pk.eyJ1IjoiZGV2ZHV0dDAzIiwiYSI6ImNtM2JsbTBkODFnN3EyanNjODl6NjIwZG4ifQ.oHgNKjHMdHf4WW_Kkwsmrg', {
-            attribution: '&copy; <a href="https://www.mapbox.com/about/maps/">Mapbox</a>',
-              id: 'mapbox.streets'
-             }).addTo(map);
-
-            // Add a marker at the user's location
-            userMarker = L.marker([currentLat, currentLng]).addTo(map)
-                .bindPopup("You are here")
-                .openPopup();
-
-            // Add markers for the available cars
-            availableCars.forEach(car => {
-                car.marker = L.marker([car.lat, car.lng]).addTo(map)
-                    .bindPopup(`${car.name}`);
+            // Initialize Map Centered on User Location
+            map = new mapboxgl.Map({
+                container: 'map', // HTML container ID
+                style: 'mapbox://styles/mapbox/streets-v11', // Map style
+                center: [currentLng, currentLat], // Initial center [lng, lat]
+                zoom: 15 // Zoom level
             });
 
-            // Calculate distance from user to each car and update the list
+            // Add User's Location Marker
+            userMarker = new mapboxgl.Marker({ color: 'blue' })
+                .setLngLat([currentLng, currentLat])
+                .setPopup(new mapboxgl.Popup().setHTML('<strong>You are here!</strong>'))
+                .addTo(map);
+
+            // Add Markers for Available Cars
+            availableCars.forEach(car => {
+                new mapboxgl.Marker({ color: 'red' })
+                    .setLngLat([car.lng, car.lat])
+                    .setPopup(new mapboxgl.Popup().setHTML(`<strong>${car.name}</strong>`))
+                    .addTo(map);
+            });
+
+            // Update the List of Available Cars
             updateAvailableCars();
+        }, error => {
+            console.error("Error getting location: ", error);
+            alert("Unable to access your location. Please enable location services.");
         });
     } else {
-        alert("Geolocation is not supported by this browser.");
+        alert("Geolocation is not supported by your browser.");
     }
 }
 
-// Haversine formula to calculate distance between two lat/lng points
+// Calculate Distance (Haversine Formula)
 function haversine(lat1, lon1, lat2, lon2) {
-    const R = 6371; // Radius of the Earth in km
+    const R = 6371; // Earth radius in km
     const dLat = (lat2 - lat1) * Math.PI / 180;
     const dLon = (lon2 - lon1) * Math.PI / 180;
     const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
@@ -55,8 +64,26 @@ function haversine(lat1, lon1, lat2, lon2) {
     return R * c; // Distance in km
 }
 
-// Update the list of available cars and their distances
+// Update Available Cars List
 function updateAvailableCars() {
-    let carList = document.getElementById('carList');
-    carList.innerHTML = ''; // Clear 
+    const carList = document.getElementById('carList');
+    carList.innerHTML = ''; // Clear existing list
 
+    availableCars.forEach(car => {
+        // Calculate Distance
+        const distance = haversine(currentLat, currentLng, car.lat, car.lng).toFixed(2);
+
+        // Add Car to List
+        const listItem = document.createElement('li');
+        listItem.textContent = `${car.name} - ${distance} km away`;
+        carList.appendChild(listItem);
+    });
+}
+
+// Request a Ride
+function requestRide() {
+    alert("Ride requested! A driver will be notified.");
+}
+
+// Initialize Map on Window Load
+window.onload = initMap;
