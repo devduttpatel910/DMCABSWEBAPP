@@ -4,11 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DMCABS - Passenger App</title>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-    <link rel="stylesheet" href="style.css"> <!-- Link to external CSS -->
+    <!-- Mapbox CSS -->
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css"> <!-- External CSS -->
 </head>
 <body>
-    <div id="map"></div> <!-- Map container -->
+    <!-- Map Container -->
+    <div id="map"></div>
+
+    <!-- Ride Request Button -->
     <div class="button-container">
         <button class="request-ride-btn" onclick="requestRide()">Request a Ride</button>
     </div>
@@ -19,7 +23,8 @@
         <ul id="carList"></ul>
     </div>
 
-    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script> <!-- Leaflet JS -->
-    <script src="script.js"></script> <!-- Link to external JavaScript -->
+    <!-- Mapbox JS -->
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
+    <script src="script.js"></script> <!-- External JS -->
 </body>
 </html>
