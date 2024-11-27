@@ -70,52 +70,15 @@ function driverLocation() {
     alert(`Driver is ${distance} meters away.`);
 }
 
-// Firebase Database Integration
-const db = firebase.database();
-const alcoholLevelRef = db.ref('alcoholLevel');
 
-// Update Alcohol Level Meter
-alcoholLevelRef.on('value', snapshot => {
-    const alcoholLevel = snapshot.val();
-    console.log("Alcohol Level: ", alcoholLevel);
-
-    // Update the progress bar
-    const alcoholLevelBar = document.getElementById('alcohol-level-bar');
-    const percentage = Math.min(alcoholLevel / 1000 * 100, 100); // Cap at 100%
-    alcoholLevelBar.style.width = `${percentage}%`;
-
-    // Alert if alcohol level exceeds threshold
-    if (alcoholLevel > 500) {
-        sendNotification("High Alcohol Level Detected!");
-    }
-});
-
-// Send browser notification
-function sendNotification(message) {
-    if (Notification.permission === "granted") {
-        new Notification("DMCabs Alert", { body: message });
-    } else if (Notification.permission !== "denied") {
-        Notification.requestPermission().then(permission => {
-            if (permission === "granted") {
-                new Notification("DMCabs Alert", { body: message });
-            }
-        });
-    }
-}
-
-// Request notification permissions on page load
-document.addEventListener('DOMContentLoaded', () => {
-    if (Notification.permission !== "granted") {
-        Notification.requestPermission();
-    }
-});
 
 //new line
 
-import { initializeApp } from "firebase/app";
-import { getMessaging, getToken, onMessage } from "firebase/messaging";
+// Import Firebase and Firebase Messaging
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+import { getMessaging, onMessage } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-messaging.js";
 
-// Firebase config object (from Firebase Console)
+// Your Firebase web app configuration
 const firebaseConfig = {
   apiKey: "AIzaSyCgnLPj3mZ9Oo6gcN66RwIzX4AkzEJGO-A",
   authDomain: "lastattempt-c591e.firebaseapp.com",
@@ -128,30 +91,46 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
-
-// Initialize Firebase Cloud Messaging
 const messaging = getMessaging(app);
 
-// Request permission for notifications
-messaging
-  .requestPermission()
-  .then(() => {
-    console.log("Notification permission granted.");
+// Request permission to send notifications
+function requestNotificationPermission() {
+  Notification.requestPermission()
+    .then(permission => {
+      if (permission === "granted") {
+        console.log("Notification permission granted.");
+        getFCMToken();
+      } else {
+        console.error("Notification permission denied.");
+      }
+    });
+}
+import { getToken } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-messaging.js";
 
-    // Get the FCM token
-    return getToken(messaging);
-  })
-  .then(token => {
-    console.log("FCM Token:", token);
-    // Save this token to your database to send push notifications to the device
-  })
-  .catch(error => {
-    console.error("Error getting permission or token:", error);
-  });
-// Listen for incoming messages
+function getFCMToken() {
+  getToken(messaging, { vapidKey: "<YOUR_PUBLIC_VAPID_KEY>" }) // Replace with your VAPID key
+    .then(currentToken => {
+      if (currentToken) {
+        console.log("FCM Token:", currentToken);
+        // Send this token to your server for backend integration
+      } else {
+        console.warn("No registration token available. Request permission to generate one.");
+      }
+    })
+    .catch(err => {
+      console.error("An error occurred while retrieving token. ", err);
+    });
+}
+
 onMessage(messaging, payload => {
-  console.log("Message received:", payload);
-  alert(payload.notification.body); // Display a browser alert with the notification body
-});
+  console.log("Message received. ", payload);
+  // Display notification content
+  const notificationTitle = payload.notification.title;
+  const notificationOptions = {
+    body: payload.notification.body,
+    icon: payload.notification.icon
+  };
 
+  new Notification(notificationTitle, notificationOptions);
+});
 
