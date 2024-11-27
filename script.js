@@ -133,4 +133,15 @@ onMessage(messaging, payload => {
 
   new Notification(notificationTitle, notificationOptions);
 });
+const alcoholLevelRef = db.ref('alcoholLevel');
+
+alcoholLevelRef.on('value', snapshot => {
+  const alcoholLevel = snapshot.val();
+
+  if (alcoholLevel > 500) {
+    sendNotification("High Alcohol Level Detected!");
+    // Optionally trigger server-side push notification here
+  }
+});
+
 
