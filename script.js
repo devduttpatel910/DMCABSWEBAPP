@@ -109,3 +109,49 @@ document.addEventListener('DOMContentLoaded', () => {
         Notification.requestPermission();
     }
 });
+
+//new line
+
+import { initializeApp } from "firebase/app";
+import { getMessaging, getToken, onMessage } from "firebase/messaging";
+
+// Firebase config object (from Firebase Console)
+const firebaseConfig = {
+  apiKey: "AIzaSyCgnLPj3mZ9Oo6gcN66RwIzX4AkzEJGO-A",
+  authDomain: "lastattempt-c591e.firebaseapp.com",
+  databaseURL: "https://lastattempt-c591e-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "lastattempt-c591e",
+  storageBucket: "lastattempt-c591e.appspot.com",
+  messagingSenderId: "6355846024",
+  appId: "1:6355846024:web:b0de795b5da3793470f03d"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+
+// Initialize Firebase Cloud Messaging
+const messaging = getMessaging(app);
+
+// Request permission for notifications
+messaging
+  .requestPermission()
+  .then(() => {
+    console.log("Notification permission granted.");
+
+    // Get the FCM token
+    return getToken(messaging);
+  })
+  .then(token => {
+    console.log("FCM Token:", token);
+    // Save this token to your database to send push notifications to the device
+  })
+  .catch(error => {
+    console.error("Error getting permission or token:", error);
+  });
+// Listen for incoming messages
+onMessage(messaging, payload => {
+  console.log("Message received:", payload);
+  alert(payload.notification.body); // Display a browser alert with the notification body
+});
+
+
